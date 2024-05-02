@@ -10,9 +10,13 @@ branding:
 # Define your inputs here.
 inputs:
   targets:
-    description: 'List of targets the action should create an executable'
+    description: 'List of targets the action should create an executable for'
     required: true
     default: ''
+  srcDir:
+    description: 'The folder containing the "target" directory. AKA your source folder.'
+    required: false
+    default: "./"
 runs:
   using: node20
   main: dist/index.js
