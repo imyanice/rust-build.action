@@ -117,6 +117,8 @@ try {
                     (buildOptions.icon.startsWith('./')
                       ? buildOptions.icon.replace('./', '')
                       : buildOptions.icon)
+                  console.log(iconPath)
+                  console.log(path.extname(iconPath))
                   if (
                     path.extname(iconPath) == '' ||
                     path.extname(iconPath) !== '.png' ||
@@ -130,7 +132,7 @@ try {
                       '.app/Contents/Resources/' +
                       buildOptions.icon.includes('/')
                       ? // @ts-ignore the array will never be undefined because it contains a "/"
-                        buildOptions.icon.split('/').pop().toString()
+                        iconPath.split('/').pop().toString()
                       : buildOptions.icon,
                     err1 => {
                       if (err1) core.setFailed(err1.message)
