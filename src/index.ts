@@ -90,7 +90,7 @@ try {
     if (targets === null || getInput('targets') !== 'aarch64-apple-darwin')
       core.setFailed('Please specify correct targets!')
     if (targets)
-      createRelease().then(release => {
+      createRelease(tomlData.package.version).then(release => {
         targets.forEach(target => {
           switch (target) {
             case 'aarch64-apple-darwin': {

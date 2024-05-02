@@ -49151,7 +49151,7 @@ function allReleases(github, owner, repo) {
     const params = { per_page: 100, owner, repo };
     return github.paginate.iterator(github.rest.repos.listReleases.endpoint.merge(params));
 }
-async function createRelease() {
+async function createRelease(version) {
     if (process.env.GITHUB_TOKEN === undefined) {
         throw new Error('GITHUB_TOKEN is required');
     }
@@ -49159,7 +49159,9 @@ async function createRelease() {
     let releaseName = core.getInput('releaseName').replace('refs/tags/', '');
     let repo = lib_github.context.repo.repo;
     let draft = true;
-    let tagName = core.getInput('tagName').replace('refs/tags/', '');
+    let tagName = core.getInput('tagName')
+        .replace('refs/tags/', '')
+        .replace('__VERSION__', version);
     // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
     const github = (0,lib_github.getOctokit)(process.env.GITHUB_TOKEN);
     let release = null;
@@ -49340,7 +49342,7 @@ try {
         if (targets === null || (0,core.getInput)('targets') !== 'aarch64-apple-darwin')
             core.setFailed('Please specify correct targets!');
         if (targets)
-            createRelease().then(release => {
+            createRelease(tomlData.package.version).then(release => {
                 targets.forEach(target => {
                     switch (target) {
                         case 'aarch64-apple-darwin': {

@@ -29,5 +29,5 @@ jobs:
         with:
           tagName: app-v__VERSION__
           releaseName: 'App v__VERSION__'
-          targets: 'x86_64-apple-darwin,aarch64-apple-darwin'
+          targets: 'aarch64-apple-darwin'
           srcDir: './test-dir/'

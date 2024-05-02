@@ -28,7 +28,7 @@ function allReleases(
   )
 }
 
-export async function createRelease(): Promise<Release> {
+export async function createRelease(version: string): Promise<Release> {
   if (process.env.GITHUB_TOKEN === undefined) {
     throw new Error('GITHUB_TOKEN is required')
   }
@@ -36,7 +36,10 @@ export async function createRelease(): Promise<Release> {
   let releaseName = core.getInput('releaseName').replace('refs/tags/', '')
   let repo = context.repo.repo
   let draft = true
-  let tagName = core.getInput('tagName').replace('refs/tags/', '')
+  let tagName = core
+    .getInput('tagName')
+    .replace('refs/tags/', '')
+    .replace('__VERSION__', version)
   // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
   const github = getOctokit(process.env.GITHUB_TOKEN)
 
