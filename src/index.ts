@@ -8,7 +8,10 @@ import { getInput } from '@actions/core'
 
 try {
   execa('echo', ['args'], { stdio: 'inherit' })
-  console.log(getInput("targets"))
+  let targets = getInput("targets").split(",")
+  targets.forEach((target) => {
+    console.log(target)
+  })
   console.log(fs.readdirSync('./'))
 } catch (error) {
   // Fail the workflow run if an error occurs
