@@ -45,17 +45,17 @@ try {
             case 'aarch64-apple-darwin': {
               fs.mkdir(
                 './bundles/aarch64-apple-darwin/' +
-                buildOptions.displayName +
-                '.app/Contents/MacOS/',
+                  buildOptions.displayName +
+                  '.app/Contents/MacOS/',
                 { recursive: true },
                 err => {
                   if (err) core.setFailed(err.message)
                   fs.copyFile(
                     srcDir + 'target/aarch64-apple-darwin/debug/' + packageName,
                     './bundles/aarch64-apple-darwin/' +
-                    buildOptions.displayName +
-                    '.app/Contents/MacOS/' +
-                    packageName,
+                      buildOptions.displayName +
+                      '.app/Contents/MacOS/' +
+                      packageName,
                     err1 => {
                       if (err1) core.setFailed(err1.message)
                       let iconPath =
@@ -65,10 +65,12 @@ try {
                           : buildOptions.icon)
                       console.log(iconPath)
                       console.log(path.basename(iconPath))
-                      fs.mkdir('./bundles/aarch64-apple-darwin/' +
-                        buildOptions.displayName +
-                        '.app/Contents/Resources/',
-                        { recursive: true }, (e) => {
+                      fs.mkdir(
+                        './bundles/aarch64-apple-darwin/' +
+                          buildOptions.displayName +
+                          '.app/Contents/Resources/',
+                        { recursive: true },
+                        e => {
                           if (
                             path.extname(iconPath) == '' ||
                             (path.extname(iconPath) !== '.png' &&
@@ -78,14 +80,15 @@ try {
                           fs.copyFile(
                             iconPath,
                             './bundles/aarch64-apple-darwin/' +
-                            buildOptions.displayName +
-                            '.app/Contents/Resources/' + path.basename(iconPath),
+                              buildOptions.displayName +
+                              '.app/Contents/Resources/' +
+                              path.basename(iconPath),
                             err1 => {
                               if (err1) core.setFailed(err1.message)
                               fs.writeFile(
                                 './bundles/aarch64-apple-darwin/' +
-                                buildOptions.displayName +
-                                '.app/Contents/Info.plist',
+                                  buildOptions.displayName +
+                                  '.app/Contents/Info.plist',
                                 getInfoPlist(
                                   buildOptions,
                                   packageName,
@@ -95,25 +98,25 @@ try {
                                   if (err2) core.setFailed(err2.message)
                                   compressDir(
                                     './bundles/aarch64-apple-darwin/' +
-                                    buildOptions.displayName +
-                                    '.app',
+                                      buildOptions.displayName +
+                                      '.app',
                                     './bundles/aarch64-apple-darwin/' +
-                                    buildOptions.displayName +
-                                    '.app.tar.gz'
+                                      buildOptions.displayName +
+                                      '.app.tar.gz'
                                   ).then(() => {
                                     uploadAssets(
                                       release.id,
                                       './bundles/aarch64-apple-darwin/' +
-                                      buildOptions.displayName +
-                                      '.app.tar.gz'
+                                        buildOptions.displayName +
+                                        '.app.tar.gz'
                                     )
                                   })
                                 }
                               )
                             }
                           )
-                        })
-
+                        }
+                      )
                     }
                   )
                 }
