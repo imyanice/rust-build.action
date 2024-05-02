@@ -51,7 +51,7 @@ interface BuildOptions {
     | 'public.app-category.video'
     | 'public.app-category.weather'
   copyright: string
-  icon: string[]
+  icon: string
   displayName: string
 }
 
@@ -68,7 +68,7 @@ class BuildOptions {
 try {
   execa('echo', ['args'], { stdio: 'inherit' })
   let targets = getInput('targets').split(',')
-  let tomlData: string
+  let tomlData: any
   let srcDir =
     (getInput('srcDir').startsWith('./')
       ? getInput('srcDir')
@@ -76,14 +76,11 @@ try {
     (getInput('srcDir').endsWith('/') ? '' : '/')
   fs.readFile(srcDir + 'Cargo.toml', 'utf-8', (err, data) => {
     if (err) core.setFailed(err.message)
-    tomlData = data
-    let packageName = JSON.parse(JSON.stringify(toml.parse(tomlData))).package
-      .name
+    tomlData = JSON.parse(JSON.stringify(toml.parse(tomlData)))
+    let packageName = tomlData.package.name
     if (packageName == undefined)
       core.setFailed('Could not find your package name in your Cargo.toml.')
-    let buildOptions = new BuildOptions(
-      JSON.parse(JSON.stringify(toml.parse(tomlData)))['rust-build-macos']
-    )
+    let buildOptions = new BuildOptions(tomlData['rust-build-macos'])
     if (buildOptions == undefined) core.setFailed('Invalid toml data!')
 
     targets.forEach(target => {
@@ -108,6 +105,27 @@ try {
               if (err1) core.setFailed(err1.message)
             }
           )
+          fs.copyFile(
+            srcDir + buildOptions.icon.startsWith('./')
+              ? buildOptions.icon.replace('./', '')
+              : buildOptions.icon,
+            './bundles/aarch64-apple-darwin/' +
+              buildOptions.displayName +
+              '.app/Contents/Resources/' +
+              buildOptions.icon,
+            err1 => {
+              if (err1) core.setFailed(err1.message)
+            }
+          )
+          fs.writeFile(
+            './bundles/aarch64-apple-darwin/' +
+              buildOptions.displayName +
+              '.app/Contents/Info.plist',
+            getInfoPlist(buildOptions, packageName, tomlData.package.version),
+            err2 => {
+              if (err2) core.setFailed(err2.message)
+            }
+          )
         }
       }
     })
@@ -116,4 +134,49 @@ try {
 } catch (error) {
   // Fail the workflow run if an error occurs
   if (error instanceof Error) core.setFailed(error.message)
+}
+
+function getInfoPlist(
+  buildOptions: BuildOptions,
+  packageName: string,
+  version: string
+): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>English</string>
+        <key>CFBundleDisplayName</key>
+        <string>${buildOptions.displayName}</string>
+        <key>CFBundleIconFile</key>
+        <string>icon.png</string>
+        <key>CFBundleExecutable</key>
+        <string>${packageName}</string>
+        <key>CFBundleIdentifier</key>
+        <string>${buildOptions.identifier}</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleName</key>
+        <string>${buildOptions.identifier}</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleShortVersionString</key>
+        <string>${version}</string>
+        <key>CFBundleVersion</key>
+        <string>20240330.144746</string>
+        <key>CSResourcesFileMapped</key>
+        <true/>
+        <key>LSApplicationCategoryType</key>
+        <string>${buildOptions.category}</string>
+        <key>LSMinimumSystemVersion</key>
+        <string>10.13</string>
+        <key>LSRequiresCarbon</key>
+        <true/>
+        <key>NSHighResolutionCapable</key>
+        <true/>
+        <key>NSHumanReadableCopyright</key>
+        <string>${buildOptions.copyright}</string>
+    </dict>
+</plist>`
 }
