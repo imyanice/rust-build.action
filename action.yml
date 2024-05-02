@@ -14,9 +14,10 @@ inputs:
     required: true
     default: ''
   srcDir:
-    description: 'The folder containing the "target" directory. AKA your source folder.'
+    description:
+      'The folder containing the "target" directory. AKA your source folder.'
     required: false
-    default: "./"
+    default: './'
 runs:
   using: node20
   main: dist/index.js
