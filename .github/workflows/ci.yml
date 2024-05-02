@@ -24,6 +24,10 @@ jobs:
       - name: Test Local Action
         id: test-action
         uses: ./
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          tagName: app-v__VERSION__
+          releaseName: 'App v__VERSION__'
           targets: 'x86_64-apple-darwin,aarch64-apple-darwin'
           srcDir: './test-dir/'

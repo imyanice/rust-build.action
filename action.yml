@@ -18,6 +18,11 @@ inputs:
       'The folder containing the "target" directory. AKA your source folder.'
     required: false
     default: './'
+  releaseName:
+    description: 'The name of the release to create'
+  tagName:
+    description: 'The tag name of the release to create'
+
 runs:
   using: node20
   main: dist/index.js

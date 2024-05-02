@@ -6,10 +6,13 @@ import fs from 'node:fs'
 import * as core from '@actions/core'
 import { getInput } from '@actions/core'
 import * as toml from 'toml'
+import { tgz } from 'compressing'
+import { createRelease } from './createRelease.js'
+import { uploadAssets } from './uploadAssets.js'
+import compressDir = tgz.compressDir
 
-interface BuildOptions {
-  identifier: string
-  category:
+class BuildOptions {
+  public category:
     | 'public.app-category.business'
     | 'public.app-category.developer-tools'
     | 'public.app-category.education'
@@ -50,12 +53,11 @@ interface BuildOptions {
     | 'public.app-category.utilities'
     | 'public.app-category.video'
     | 'public.app-category.weather'
-  copyright: string
-  icon: string
-  displayName: string
-}
+  public icon: string
+  public identifier: string
+  public copyright: string
+  public displayName: string
 
-class BuildOptions {
   constructor(parseElement: any) {
     this.category = parseElement.category
     this.icon = parseElement.icon
@@ -85,52 +87,79 @@ try {
     if (buildOptions == undefined) core.setFailed('Invalid toml data!')
     console.log(buildOptions)
     console.log(tomlData)
-    targets.forEach(target => {
-      switch (target) {
-        case 'aarch64-apple-darwin': {
-          fs.mkdir(
-            './bundles/aarch64-apple-darwin/' +
-              buildOptions.displayName +
-              '.app/Contents/MacOS/',
-            { recursive: true },
-            err => {
-              if (err) core.setFailed(err.message)
+    if (targets === null || getInput('targets') !== 'aarch64-apple-darwin')
+      core.setFailed('Please specify correct targets!')
+    if (targets)
+      createRelease().then(release => {
+        targets.forEach(target => {
+          switch (target) {
+            case 'aarch64-apple-darwin': {
+              fs.mkdir(
+                './bundles/aarch64-apple-darwin/' +
+                  buildOptions.displayName +
+                  '.app/Contents/MacOS/',
+                { recursive: true },
+                err => {
+                  if (err) core.setFailed(err.message)
+                  fs.copyFile(
+                    srcDir + 'target/aarch64-apple-darwin/debug/' + packageName,
+                    './bundles/aarch64-apple-darwin/' +
+                      buildOptions.displayName +
+                      '.app/Contents/MacOS/' +
+                      packageName,
+                    err1 => {
+                      if (err1) core.setFailed(err1.message)
+                    }
+                  )
+                  fs.copyFile(
+                    srcDir + buildOptions.icon.startsWith('./')
+                      ? buildOptions.icon.replace('./', '')
+                      : buildOptions.icon,
+                    './bundles/aarch64-apple-darwin/' +
+                      buildOptions.displayName +
+                      '.app/Contents/Resources/' +
+                      buildOptions.icon,
+                    err1 => {
+                      if (err1) core.setFailed(err1.message)
+                    }
+                  )
+                  fs.writeFile(
+                    './bundles/aarch64-apple-darwin/' +
+                      buildOptions.displayName +
+                      '.app/Contents/Info.plist',
+                    getInfoPlist(
+                      buildOptions,
+                      packageName,
+                      tomlData.package.version
+                    ),
+                    err2 => {
+                      if (err2) core.setFailed(err2.message)
+                    }
+                  )
+                  setTimeout(() => {
+                    compressDir(
+                      './bundles/aarch64-apple-darwin/' +
+                        buildOptions.displayName +
+                        '.app',
+                      './bundles/aarch64-apple-darwin/' +
+                        buildOptions.displayName +
+                        '.app.tar.gz'
+                    ).then(() => {
+                      uploadAssets(
+                        release.id,
+                        './bundles/aarch64-apple-darwin/' +
+                          buildOptions.displayName +
+                          '.app.tar.gz'
+                      )
+                    })
+                  }, 1000)
+                }
+              )
             }
-          )
-          fs.copyFile(
-            srcDir + 'target/aarch64-apple-darwin/debug/' + packageName,
-            './bundles/aarch64-apple-darwin/' +
-              buildOptions.displayName +
-              '.app/Contents/MacOS/' +
-              packageName,
-            err1 => {
-              if (err1) core.setFailed(err1.message)
-            }
-          )
-          fs.copyFile(
-            srcDir + buildOptions.icon.startsWith('./')
-              ? buildOptions.icon.replace('./', '')
-              : buildOptions.icon,
-            './bundles/aarch64-apple-darwin/' +
-              buildOptions.displayName +
-              '.app/Contents/Resources/' +
-              buildOptions.icon,
-            err1 => {
-              if (err1) core.setFailed(err1.message)
-            }
-          )
-          fs.writeFile(
-            './bundles/aarch64-apple-darwin/' +
-              buildOptions.displayName +
-              '.app/Contents/Info.plist',
-            getInfoPlist(buildOptions, packageName, tomlData.package.version),
-            err2 => {
-              if (err2) core.setFailed(err2.message)
-            }
-          )
-        }
-      }
-    })
+          }
+        })
+      })
+
     console.log(fs.readdirSync('./'))
   })
 } catch (error) {
