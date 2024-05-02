@@ -49304,6 +49304,7 @@ async function uploadAssets(releaseId, path) {
 
 
 
+
 var compressDir = compressing.tgz.compressDir;
 class BuildOptions {
     category;
@@ -49358,12 +49359,21 @@ try {
                                     if (err1)
                                         core.setFailed(err1.message);
                                 });
-                                external_node_fs_default().copyFile(srcDir + buildOptions.icon.startsWith('./')
-                                    ? buildOptions.icon.replace('./', '')
-                                    : buildOptions.icon, './bundles/aarch64-apple-darwin/' +
+                                let iconPath = srcDir +
+                                    (buildOptions.icon.startsWith('./')
+                                        ? buildOptions.icon.replace('./', '')
+                                        : buildOptions.icon);
+                                if (external_node_path_namespaceObject.extname(iconPath) == '' ||
+                                    external_node_path_namespaceObject.extname(iconPath) !== '.png' ||
+                                    external_node_path_namespaceObject.extname(iconPath) !== '.icns')
+                                    core.setFailed('Invalid icon!');
+                                external_node_fs_default().copyFile(iconPath, './bundles/aarch64-apple-darwin/' +
                                     buildOptions.displayName +
                                     '.app/Contents/Resources/' +
-                                    buildOptions.icon, err1 => {
+                                    buildOptions.icon.includes('/')
+                                    ? // @ts-ignore the array will never be undefined because it contains a "/"
+                                        buildOptions.icon.split('/').pop().toString()
+                                    : 0, err1 => {
                                     if (err1)
                                         core.setFailed(err1.message);
                                 });

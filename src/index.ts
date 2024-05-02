@@ -9,6 +9,7 @@ import * as toml from 'toml'
 import { tgz } from 'compressing'
 import { createRelease } from './createRelease.js'
 import { uploadAssets } from './uploadAssets.js'
+import * as path from 'node:path'
 import compressDir = tgz.compressDir
 
 class BuildOptions {
@@ -111,14 +112,26 @@ try {
                       if (err1) core.setFailed(err1.message)
                     }
                   )
-                  fs.copyFile(
-                    srcDir + buildOptions.icon.startsWith('./')
+                  let iconPath =
+                    srcDir +
+                    (buildOptions.icon.startsWith('./')
                       ? buildOptions.icon.replace('./', '')
-                      : buildOptions.icon,
+                      : buildOptions.icon)
+                  if (
+                    path.extname(iconPath) == '' ||
+                    path.extname(iconPath) !== '.png' ||
+                    path.extname(iconPath) !== '.icns'
+                  )
+                    core.setFailed('Invalid icon!')
+                  fs.copyFile(
+                    iconPath,
                     './bundles/aarch64-apple-darwin/' +
                       buildOptions.displayName +
                       '.app/Contents/Resources/' +
-                      buildOptions.icon,
+                      buildOptions.icon.includes('/')
+                      ? // @ts-ignore the array will never be undefined because it contains a "/"
+                        buildOptions.icon.split('/').pop().toString()
+                      : buildOptions.icon,
                     err1 => {
                       if (err1) core.setFailed(err1.message)
                     }

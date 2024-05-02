@@ -5,7 +5,7 @@ import * as path from 'node:path'
 
 export const extensions = ['.app.tar.gz']
 
-export function getAssetName(assetPath: string) {
+function getAssetName(assetPath: string) {
   const basename = path.basename(assetPath)
   const exts = extensions.filter(s => basename.includes(s))
   const ext = exts[0] || path.extname(assetPath)
