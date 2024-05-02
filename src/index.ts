@@ -89,6 +89,15 @@ try {
     targets.forEach(target => {
       switch (target) {
         case 'aarch64-apple-darwin': {
+          fs.mkdir(
+            './bundles/aarch64-apple-darwin/' +
+              buildOptions.displayName +
+              '.app/Contents/MacOS/',
+            { recursive: true },
+            err => {
+              if (err) core.setFailed(err.message)
+            }
+          )
           fs.copyFile(
             srcDir + 'target/aarch64-apple-darwin/debug/' + packageName,
             './bundles/aarch64-apple-darwin/' +
