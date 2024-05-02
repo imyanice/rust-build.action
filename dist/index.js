@@ -49351,33 +49351,34 @@ try {
                                             ? buildOptions.icon.replace('./', '')
                                             : buildOptions.icon);
                                     console.log(iconPath);
-                                    console.log(external_node_path_namespaceObject.extname(iconPath));
-                                    if (external_node_path_namespaceObject.extname(iconPath) == '' ||
-                                        (external_node_path_namespaceObject.extname(iconPath) !== '.png' &&
-                                            external_node_path_namespaceObject.extname(iconPath) !== '.icns'))
-                                        core.setFailed('Invalid icon!');
-                                    external_node_fs_default().copyFile(iconPath, './bundles/aarch64-apple-darwin/' +
+                                    console.log(external_node_path_namespaceObject.basename(iconPath));
+                                    external_node_fs_default().mkdir('./bundles/aarch64-apple-darwin/' +
                                         buildOptions.displayName +
-                                        '.app/Contents/Resources/' +
-                                        buildOptions.icon.includes('/')
-                                        ? // @ts-ignore the array will never be undefined because it contains a "/"
-                                            iconPath.split('/').pop().toString()
-                                        : 0, err1 => {
-                                        if (err1)
-                                            core.setFailed(err1.message);
-                                        external_node_fs_default().writeFile('./bundles/aarch64-apple-darwin/' +
+                                        '.app/Contents/Resources/', { recursive: true }, e => {
+                                        if (external_node_path_namespaceObject.extname(iconPath) == '' ||
+                                            (external_node_path_namespaceObject.extname(iconPath) !== '.png' &&
+                                                external_node_path_namespaceObject.extname(iconPath) !== '.icns'))
+                                            core.setFailed('Invalid icon!');
+                                        external_node_fs_default().copyFile(iconPath, './bundles/aarch64-apple-darwin/' +
                                             buildOptions.displayName +
-                                            '.app/Contents/Info.plist', getInfoPlist(buildOptions, packageName, tomlData.package.version), err2 => {
-                                            if (err2)
-                                                core.setFailed(err2.message);
-                                            compressDir('./bundles/aarch64-apple-darwin/' +
+                                            '.app/Contents/Resources/' +
+                                            external_node_path_namespaceObject.basename(iconPath), err1 => {
+                                            if (err1)
+                                                core.setFailed(err1.message);
+                                            external_node_fs_default().writeFile('./bundles/aarch64-apple-darwin/' +
                                                 buildOptions.displayName +
-                                                '.app', './bundles/aarch64-apple-darwin/' +
-                                                buildOptions.displayName +
-                                                '.app.tar.gz').then(() => {
-                                                uploadAssets(release.id, './bundles/aarch64-apple-darwin/' +
+                                                '.app/Contents/Info.plist', getInfoPlist(buildOptions, packageName, tomlData.package.version), err2 => {
+                                                if (err2)
+                                                    core.setFailed(err2.message);
+                                                compressDir('./bundles/aarch64-apple-darwin/' +
                                                     buildOptions.displayName +
-                                                    '.app.tar.gz');
+                                                    '.app', './bundles/aarch64-apple-darwin/' +
+                                                    buildOptions.displayName +
+                                                    '.app.tar.gz').then(() => {
+                                                    uploadAssets(release.id, './bundles/aarch64-apple-darwin/' +
+                                                        buildOptions.displayName +
+                                                        '.app.tar.gz');
+                                                });
                                             });
                                         });
                                     });
