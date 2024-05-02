@@ -1,0 +1,17 @@
+[package]
+name = "pomodoro-timer"
+version = "0.1.0"
+authors = ["Yanice <git@yanice.me>"]
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+slint = "1.5"
+tokio = { version = "1.37.0", features = ["time"] }
+confy = "0.6.1"
+serde = { version = "1.0.199", features = ["derive"] }
+
+[build-dependencies]
+slint-build = "1.5"

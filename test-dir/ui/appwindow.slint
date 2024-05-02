@@ -1,0 +1,26 @@
+import { Button } from "std-widgets.slint";
+import "./assets/font.ttf";
+
+export component AppWindow inherits Window {
+    width: 300px;
+    height: 400px;
+    in-out property <string> time: "25:00";
+    in-out property <string> state: "🚀";
+    callback start-timer();
+    title: "Timer";
+    Text {
+        text: time;
+        font-size: 70px;
+        y: 150px;
+        font-family: "Bebas Neue";
+    }
+
+    Button {
+        text: state;
+        y: 250px;
+        width: 100px;
+        clicked => {
+            start-timer()
+        }
+    }
+}
