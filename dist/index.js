@@ -49366,8 +49366,8 @@ try {
                                 console.log(iconPath);
                                 console.log(external_node_path_namespaceObject.extname(iconPath));
                                 if (external_node_path_namespaceObject.extname(iconPath) == '' ||
-                                    external_node_path_namespaceObject.extname(iconPath) !== '.png' ||
-                                    external_node_path_namespaceObject.extname(iconPath) !== '.icns')
+                                    (external_node_path_namespaceObject.extname(iconPath) !== '.png' &&
+                                        external_node_path_namespaceObject.extname(iconPath) !== '.icns'))
                                     core.setFailed('Invalid icon!');
                                 external_node_fs_default().copyFile(iconPath, './bundles/aarch64-apple-darwin/' +
                                     buildOptions.displayName +

@@ -121,8 +121,8 @@ try {
                   console.log(path.extname(iconPath))
                   if (
                     path.extname(iconPath) == '' ||
-                    path.extname(iconPath) !== '.png' ||
-                    path.extname(iconPath) !== '.icns'
+                    (path.extname(iconPath) !== '.png' &&
+                      path.extname(iconPath) !== '.icns')
                   )
                     core.setFailed('Invalid icon!')
                   fs.copyFile(
