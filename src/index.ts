@@ -8,8 +8,8 @@ import { getInput } from '@actions/core'
 
 try {
   execa('echo', ['args'], { stdio: 'inherit' })
-  let targets = getInput("targets").split(",")
-  targets.forEach((target) => {
+  let targets = getInput('targets').split(',')
+  targets.forEach(target => {
     console.log(target)
   })
   console.log(fs.readdirSync('./'))

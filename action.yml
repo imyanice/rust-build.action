@@ -12,7 +12,7 @@ inputs:
   targets:
     description: 'List of targets the action should create an executable'
     required: true
-    default: ""
+    default: ''
 runs:
   using: node20
   main: dist/index.js

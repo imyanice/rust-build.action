@@ -29648,8 +29648,13 @@ var core = __nccwpck_require__(9093);
 
 
 
+
 try {
     execa('echo', ['args'], { stdio: 'inherit' });
+    let targets = (0,core.getInput)('targets').split(',');
+    targets.forEach(target => {
+        console.log(target);
+    });
     console.log(external_node_fs_default().readdirSync('./'));
 }
 catch (error) {

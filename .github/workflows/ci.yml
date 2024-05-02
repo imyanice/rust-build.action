@@ -25,5 +25,4 @@ jobs:
         id: test-action
         uses: ./
         with:
-          targets: "x86_64-apple-darwin,aarch64-apple-darwin"
-
+          targets: 'x86_64-apple-darwin,aarch64-apple-darwin'
