@@ -74,9 +74,10 @@ try {
       ? getInput('srcDir')
       : './' + getInput('srcDir')) +
     (getInput('srcDir').endsWith('/') ? '' : '/')
+
   fs.readFile(srcDir + 'Cargo.toml', 'utf-8', (err, data) => {
     if (err) core.setFailed(err.message)
-    tomlData = JSON.parse(JSON.stringify(toml.parse(tomlData)))
+    tomlData = JSON.parse(JSON.stringify(toml.parse(data)))
     let packageName = tomlData.package.name
     if (packageName == undefined)
       core.setFailed('Could not find your package name in your Cargo.toml.')
