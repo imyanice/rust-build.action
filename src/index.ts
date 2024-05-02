@@ -83,7 +83,8 @@ try {
       core.setFailed('Could not find your package name in your Cargo.toml.')
     let buildOptions = new BuildOptions(tomlData['rust-build-macos'])
     if (buildOptions == undefined) core.setFailed('Invalid toml data!')
-
+    console.log(buildOptions)
+    console.log(tomlData)
     targets.forEach(target => {
       switch (target) {
         case 'aarch64-apple-darwin': {
