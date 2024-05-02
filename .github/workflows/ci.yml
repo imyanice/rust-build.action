@@ -1,18 +1,14 @@
 name: Continuous Integration
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
 
-permissions:
-  contents: read
-
 jobs:
   test-action:
+    permissions:
+      contents: write
     name: GitHub Actions Test
     runs-on: ubuntu-latest
 
