@@ -9,15 +9,10 @@ branding:
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  targets:
+    description: 'List of targets the action should create an executable'
     required: true
-    default: '1000'
-
-# Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
+    default: |-
 
 runs:
   using: node20

@@ -24,4 +24,8 @@ jobs:
       - name: Test Local Action
         id: test-action
         uses: ./
+        with:
+          targets: -|
+            aarch64-apple-darwin
+            x86_64-apple-darwin
 
