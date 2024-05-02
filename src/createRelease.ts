@@ -4,7 +4,7 @@ import * as core from '@actions/core'
 import { context, getOctokit } from '@actions/github'
 import { GitHub } from '@actions/github/lib/utils.js'
 
-interface Release {
+export interface Release {
   id: number
   uploadUrl: string
   htmlUrl: string
