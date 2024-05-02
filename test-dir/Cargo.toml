@@ -20,5 +20,5 @@ slint-build = "1.5"
 identifier = "me.yanice.pomodoro-timer"
 category = "public.app-category.utilities"
 copyright = "© 2024 Yanice (imyanice)."
-icon = ["icons/icon.png"]
+icon = "icons/icon.png"
 displayName = "Pomodoro Timer"
