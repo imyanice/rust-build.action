@@ -10,68 +10,16 @@ import { tgz } from 'compressing'
 import { createRelease } from './createRelease.js'
 import { uploadAssets } from './uploadAssets.js'
 import * as path from 'node:path'
+import * as process from 'node:process'
 import compressDir = tgz.compressDir
-
-class BuildOptions {
-  public category:
-    | 'public.app-category.business'
-    | 'public.app-category.developer-tools'
-    | 'public.app-category.education'
-    | 'public.app-category.entertainment'
-    | 'public.app-category.finance'
-    | 'public.app-category.games'
-    | 'public.app-category.action-games'
-    | 'public.app-category.adventure-games'
-    | 'public.app-category.arcade-games'
-    | 'public.app-category.board-games'
-    | 'public.app-category.card-games'
-    | 'public.app-category.casino-games'
-    | 'public.app-category.dice-games'
-    | 'public.app-category.educational-games'
-    | 'public.app-category.family-games'
-    | 'public.app-category.kids-games'
-    | 'public.app-category.music-games'
-    | 'public.app-category.puzzle-games'
-    | 'public.app-category.racing-games'
-    | 'public.app-category.role-playing-games'
-    | 'public.app-category.simulation-games'
-    | 'public.app-category.sports-games'
-    | 'public.app-category.strategy-games'
-    | 'public.app-category.trivia-games'
-    | 'public.app-category.word-games'
-    | 'public.app-category.graphics-design'
-    | 'public.app-category.healthcare-fitness'
-    | 'public.app-category.lifestyle'
-    | 'public.app-category.medical'
-    | 'public.app-category.music'
-    | 'public.app-category.news'
-    | 'public.app-category.photography'
-    | 'public.app-category.productivity'
-    | 'public.app-category.reference'
-    | 'public.app-category.social-networking'
-    | 'public.app-category.sports'
-    | 'public.app-category.travel'
-    | 'public.app-category.utilities'
-    | 'public.app-category.video'
-    | 'public.app-category.weather'
-  public icon: string
-  public identifier: string
-  public copyright: string
-  public displayName: string
-
-  constructor(parseElement: any) {
-    this.category = parseElement.category
-    this.icon = parseElement.icon
-    this.identifier = parseElement.identifier
-    this.copyright = parseElement.copyright
-    this.displayName = parseElement.displayName
-  }
-}
 
 try {
   execa('echo', ['args'], { stdio: 'inherit' })
   let targets = getInput('targets').split(',')
   let tomlData: any
+
+  let os = process.platform
+
   let srcDir =
     (getInput('srcDir').startsWith('./')
       ? getInput('srcDir')
@@ -225,4 +173,60 @@ function getInfoPlist(
         <string>${buildOptions.copyright}</string>
     </dict>
 </plist>`
+}
+
+class BuildOptions {
+  public category:
+    | 'public.app-category.business'
+    | 'public.app-category.developer-tools'
+    | 'public.app-category.education'
+    | 'public.app-category.entertainment'
+    | 'public.app-category.finance'
+    | 'public.app-category.games'
+    | 'public.app-category.action-games'
+    | 'public.app-category.adventure-games'
+    | 'public.app-category.arcade-games'
+    | 'public.app-category.board-games'
+    | 'public.app-category.card-games'
+    | 'public.app-category.casino-games'
+    | 'public.app-category.dice-games'
+    | 'public.app-category.educational-games'
+    | 'public.app-category.family-games'
+    | 'public.app-category.kids-games'
+    | 'public.app-category.music-games'
+    | 'public.app-category.puzzle-games'
+    | 'public.app-category.racing-games'
+    | 'public.app-category.role-playing-games'
+    | 'public.app-category.simulation-games'
+    | 'public.app-category.sports-games'
+    | 'public.app-category.strategy-games'
+    | 'public.app-category.trivia-games'
+    | 'public.app-category.word-games'
+    | 'public.app-category.graphics-design'
+    | 'public.app-category.healthcare-fitness'
+    | 'public.app-category.lifestyle'
+    | 'public.app-category.medical'
+    | 'public.app-category.music'
+    | 'public.app-category.news'
+    | 'public.app-category.photography'
+    | 'public.app-category.productivity'
+    | 'public.app-category.reference'
+    | 'public.app-category.social-networking'
+    | 'public.app-category.sports'
+    | 'public.app-category.travel'
+    | 'public.app-category.utilities'
+    | 'public.app-category.video'
+    | 'public.app-category.weather'
+  public icon: string
+  public identifier: string
+  public copyright: string
+  public displayName: string
+
+  constructor(parseElement: any) {
+    this.category = parseElement.category
+    this.icon = parseElement.icon
+    this.identifier = parseElement.identifier
+    this.copyright = parseElement.copyright
+    this.displayName = parseElement.displayName
+  }
 }

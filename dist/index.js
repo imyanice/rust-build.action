@@ -49305,25 +49305,13 @@ async function uploadAssets(releaseId, path) {
 
 
 
+
 var compressDir = compressing.tgz.compressDir;
-class BuildOptions {
-    category;
-    icon;
-    identifier;
-    copyright;
-    displayName;
-    constructor(parseElement) {
-        this.category = parseElement.category;
-        this.icon = parseElement.icon;
-        this.identifier = parseElement.identifier;
-        this.copyright = parseElement.copyright;
-        this.displayName = parseElement.displayName;
-    }
-}
 try {
     execa('echo', ['args'], { stdio: 'inherit' });
     let targets = (0,core.getInput)('targets').split(',');
     let tomlData;
+    let os = external_node_process_namespaceObject.platform;
     let srcDir = ((0,core.getInput)('srcDir').startsWith('./')
         ? (0,core.getInput)('srcDir')
         : './' + (0,core.getInput)('srcDir')) +
@@ -49448,6 +49436,20 @@ function getInfoPlist(buildOptions, packageName, version) {
         <string>${buildOptions.copyright}</string>
     </dict>
 </plist>`;
+}
+class BuildOptions {
+    category;
+    icon;
+    identifier;
+    copyright;
+    displayName;
+    constructor(parseElement) {
+        this.category = parseElement.category;
+        this.icon = parseElement.icon;
+        this.identifier = parseElement.identifier;
+        this.copyright = parseElement.copyright;
+        this.displayName = parseElement.displayName;
+    }
 }
 
 })();
