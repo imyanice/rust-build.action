@@ -1,7 +1,6 @@
 /**
  * The entrypoint for the action.
  */
-import { execa } from 'execa';
 import fs from 'node:fs';
 import * as core from '@actions/core';
 import { getInput } from '@actions/core';
@@ -14,7 +13,6 @@ import * as process from 'node:process';
 import compressDir = tgz.compressDir;
 
 try {
-	execa('echo', ['args'], { stdio: 'inherit' });
 	let targets = getInput('targets').split(',');
 	let tomlData: any;
 
@@ -34,7 +32,6 @@ try {
 			core.setFailed(
 				'Could not find your package name in your Cargo.toml.'
 			);
-		console.log(tomlData);
 		let buildOptions = new BuildOptions(tomlData['rust-build'].action);
 		if (buildOptions == undefined) core.setFailed('Invalid toml data!');
 		if (targets === null) core.setFailed('Please specify correct targets!');
@@ -60,8 +57,6 @@ try {
 					);
 				});
 			});
-
-		console.log(fs.readdirSync('./'));
 	});
 } catch (error) {
 	// Fail the workflow run if an error occurs
@@ -100,8 +95,6 @@ function bundleApp(
 						(buildOptions.icon.startsWith('./')
 							? buildOptions.icon.replace('./', '')
 							: buildOptions.icon);
-					console.log(iconPath);
-					console.log(path.basename(iconPath));
 					fs.mkdir(
 						'./bundles/' +
 							target +
