@@ -16,7 +16,7 @@ serde = { version = "1.0.199", features = ["derive"] }
 [build-dependencies]
 slint-build = "1.5"
 
-[rust-build-macos]
+[rust-build.action]
 identifier = "me.yanice.pomodoro-timer"
 category = "public.app-category.utilities"
 copyright = "© 2024 Yanice (imyanice)."

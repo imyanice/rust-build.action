@@ -34,7 +34,7 @@ try {
 			core.setFailed(
 				'Could not find your package name in your Cargo.toml.'
 			);
-		let buildOptions = new BuildOptions(tomlData['rust-build-macos']);
+		let buildOptions = new BuildOptions(tomlData['rust-build.action']);
 		if (buildOptions == undefined) core.setFailed('Invalid toml data!');
 		if (targets === null) core.setFailed('Please specify correct targets!');
 		if (
