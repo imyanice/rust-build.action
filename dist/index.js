@@ -46422,7 +46422,7 @@ function bundleApp(target, buildOptions, srcDir, packageName, tomlData, release)
         '.app/Contents/MacOS/', { recursive: true }, err => {
         if (err)
             core.setFailed(err.message);
-        external_node_fs_default().copyFile(srcDir + 'target/' + target + '/debug/' + packageName, './bundles/' +
+        external_node_fs_default().copyFile(srcDir + 'target/' + target + '/release/' + packageName, './bundles/' +
             target +
             '/' +
             buildOptions.displayName +

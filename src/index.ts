@@ -81,7 +81,7 @@ function bundleApp(
 		err => {
 			if (err) core.setFailed(err.message);
 			fs.copyFile(
-				srcDir + 'target/' + target + '/debug/' + packageName,
+				srcDir + 'target/' + target + '/release/' + packageName,
 				'./bundles/' +
 					target +
 					'/' +

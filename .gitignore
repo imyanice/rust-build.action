@@ -103,3 +103,6 @@ __tests__/runner/*
 *.code-workspace
 
 pnpm-lock.yaml
+deps/
+build/
+.fingerprint 
