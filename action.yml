@@ -1,11 +1,13 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'rust-build.action'
+description:
+    'Packages your rust builds into a .exe, .app and the one for linux.'
+author: 'imyanice'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
+# https://actions-cool.github.io/github-action-branding/
 branding:
-    icon: 'heart'
-    color: 'red'
+    icon: 'package'
+    color: 'blue'
 
 # Define your inputs here.
 inputs:

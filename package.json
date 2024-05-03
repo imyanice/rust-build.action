@@ -1,21 +1,21 @@
 {
-	"name": "typescript-action",
-	"description": "GitHub Actions TypeScript template",
-	"version": "0.0.0",
-	"author": "",
-	"private": true,
-	"homepage": "https://github.com/actions/typescript-action",
+	"name": "rust-build.action",
+	"description": "Packages your rust builds into a .exe, .app and the one for linux.",
+	"version": "0.1.0",
+	"author": "imyanice",
+	"private": false,
+	"homepage": "https://github.com/imyanice/rust-build.action",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/actions/typescript-action.git"
+		"url": "git+https://github.com/imyanice/rust-build.action.git"
 	},
 	"bugs": {
-		"url": "https://github.com/actions/typescript-action/issues"
+		"url": "https://github.com/imyanice/rust-build.action/issues"
 	},
 	"keywords": [
 		"actions",
-		"node",
-		"setup"
+		"rust",
+		"build"
 	],
 	"exports": {
 		".": "./dist/index.js"
@@ -34,7 +34,7 @@
 		"test": "npx jest",
 		"all": "npm run format:write && npm run lint && npm run test && npm run coverage && npm run package"
 	},
-	"license": "MIT",
+	"license": "GPL-3.0-only",
 	"jest": {
 		"preset": "ts-jest",
 		"verbose": true,
