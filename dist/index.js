@@ -49330,8 +49330,12 @@ try {
             core.setFailed('Invalid toml data!');
         if (targets === null)
             core.setFailed('Please specify correct targets!');
-        if ((0,core.getInput)('targets') !== 'aarch64-apple-darwin,x86_64-apple-darwin' &&
-            (0,core.getInput)('targets') !== 'x86_64-apple-darwin,aarch64-apple-darwin')
+        if ((0,core.getInput)('targets') !==
+            'aarch64-apple-darwin,x86_64-apple-darwin' &&
+            (0,core.getInput)('targets') !==
+                'x86_64-apple-darwin,aarch64-apple-darwin' &&
+            (0,core.getInput)('targets') !== 'x86_64-apple-darwin' &&
+            (0,core.getInput)('targets') !== 'aarch64-apple-darwin')
             core.setFailed('Please specify correct targets!');
         if (targets)
             createRelease(tomlData.package.version).then(release => {

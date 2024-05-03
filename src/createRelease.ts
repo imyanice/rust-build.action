@@ -1,112 +1,114 @@
 //taken from tauri apps
 
-import * as core from '@actions/core'
-import { context, getOctokit } from '@actions/github'
-import { GitHub } from '@actions/github/lib/utils.js'
+import * as core from '@actions/core';
+import { context, getOctokit } from '@actions/github';
+import { GitHub } from '@actions/github/lib/utils.js';
 
 export interface Release {
-  id: number
-  uploadUrl: string
-  htmlUrl: string
+	id: number;
+	uploadUrl: string;
+	htmlUrl: string;
 }
 
 interface GitHubRelease {
-  id: number
-  upload_url: string
-  html_url: string
-  tag_name: string
+	id: number;
+	upload_url: string;
+	html_url: string;
+	tag_name: string;
 }
 
 function allReleases(
-  github: InstanceType<typeof GitHub>,
-  owner: string,
-  repo: string
+	github: InstanceType<typeof GitHub>,
+	owner: string,
+	repo: string
 ): AsyncIterableIterator<{ data: GitHubRelease[] }> {
-  const params = { per_page: 100, owner, repo }
-  return github.paginate.iterator(
-    github.rest.repos.listReleases.endpoint.merge(params)
-  )
+	const params = { per_page: 100, owner, repo };
+	return github.paginate.iterator(
+		github.rest.repos.listReleases.endpoint.merge(params)
+	);
 }
 
 export async function createRelease(version: string): Promise<Release> {
-  if (process.env.GITHUB_TOKEN === undefined) {
-    throw new Error('GITHUB_TOKEN is required')
-  }
-  let owner = context.repo.owner
-  let releaseName = core
-    .getInput('releaseName')
-    .replace('refs/tags/', '')
-    .replace('__VERSION__', version)
-  let repo = context.repo.repo
-  let draft = true
-  let tagName = core
-    .getInput('tagName')
-    .replace('refs/tags/', '')
-    .replace('__VERSION__', version)
-  // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
-  const github = getOctokit(process.env.GITHUB_TOKEN)
+	if (process.env.GITHUB_TOKEN === undefined) {
+		throw new Error('GITHUB_TOKEN is required');
+	}
+	let owner = context.repo.owner;
+	let releaseName = core
+		.getInput('releaseName')
+		.replace('refs/tags/', '')
+		.replace('__VERSION__', version);
+	let repo = context.repo.repo;
+	let draft = true;
+	let tagName = core
+		.getInput('tagName')
+		.replace('refs/tags/', '')
+		.replace('__VERSION__', version);
+	// Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
+	const github = getOctokit(process.env.GITHUB_TOKEN);
 
-  let release: GitHubRelease | null = null
-  try {
-    // you can't get a an existing draft by tag
-    // so we must find one in the list of all releases
-    if (draft) {
-      console.log(`Looking for a draft release with tag ${tagName}...`)
-      for await (const response of allReleases(github, owner, repo)) {
-        const releaseWithTag = response.data.find(
-          release => release.tag_name === tagName
-        )
-        if (releaseWithTag) {
-          release = releaseWithTag
-          console.log(
-            `Found draft release with tag ${tagName} on the release list.`
-          )
-          break
-        }
-      }
-      if (!release) {
-        throw new Error('release not found')
-      }
-    } else {
-      const foundRelease = await github.rest.repos.getReleaseByTag({
-        owner,
-        repo,
-        tag: tagName
-      })
-      release = foundRelease.data
-      console.log(`Found release with tag ${tagName}.`)
-    }
-  } catch (error) {
-    // @ts-ignore
-    if (error.status === 404 || error.message === 'release not found') {
-      console.log(`Couldn't find release with tag ${tagName}. Creating one.`)
-      const createdRelease = await github.rest.repos.createRelease({
-        owner,
-        repo,
-        tag_name: tagName,
-        name: releaseName,
-        body: 'See the assets to download the app.',
-        draft,
-        prerelease: true,
-        target_commitish: context.sha
-      })
+	let release: GitHubRelease | null = null;
+	try {
+		// you can't get a an existing draft by tag
+		// so we must find one in the list of all releases
+		if (draft) {
+			console.log(`Looking for a draft release with tag ${tagName}...`);
+			for await (const response of allReleases(github, owner, repo)) {
+				const releaseWithTag = response.data.find(
+					release => release.tag_name === tagName
+				);
+				if (releaseWithTag) {
+					release = releaseWithTag;
+					console.log(
+						`Found draft release with tag ${tagName} on the release list.`
+					);
+					break;
+				}
+			}
+			if (!release) {
+				throw new Error('release not found');
+			}
+		} else {
+			const foundRelease = await github.rest.repos.getReleaseByTag({
+				owner,
+				repo,
+				tag: tagName
+			});
+			release = foundRelease.data;
+			console.log(`Found release with tag ${tagName}.`);
+		}
+	} catch (error) {
+		// @ts-ignore
+		if (error.status === 404 || error.message === 'release not found') {
+			console.log(
+				`Couldn't find release with tag ${tagName}. Creating one.`
+			);
+			const createdRelease = await github.rest.repos.createRelease({
+				owner,
+				repo,
+				tag_name: tagName,
+				name: releaseName,
+				body: 'See the assets to download the app.',
+				draft,
+				prerelease: true,
+				target_commitish: context.sha
+			});
 
-      release = createdRelease.data
-    } else {
-      console.log(
-        `⚠️ Unexpected error fetching GitHub release for tag ${tagName}: ${error}`
-      )
-      throw error
-    }
-  }
+			release = createdRelease.data;
+		} else {
+			console.log(
+				`⚠️ Unexpected error fetching GitHub release for tag ${tagName}: ${error}`
+			);
+			throw error;
+		}
+	}
 
-  if (!release) {
-    throw new Error('Release not found or created.')
-  }
+	if (!release) {
+		throw new Error('Release not found or created.');
+	}
 
-  return {
-    id: release.id,
-    uploadUrl: release.upload_url,
-    htmlUrl: release.html_url
-  }
+	return {
+		id: release.id,
+		uploadUrl: release.upload_url,
+		htmlUrl: release.html_url
+	};
 }
