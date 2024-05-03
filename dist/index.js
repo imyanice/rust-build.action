@@ -49325,6 +49325,7 @@ try {
         let packageName = tomlData.package.name;
         if (packageName == undefined)
             core.setFailed('Could not find your package name in your Cargo.toml.');
+        console.log(tomlData);
         let buildOptions = new BuildOptions(tomlData['rust-build.action']);
         if (buildOptions == undefined)
             core.setFailed('Invalid toml data!');
