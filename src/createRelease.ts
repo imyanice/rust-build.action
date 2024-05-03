@@ -33,7 +33,10 @@ export async function createRelease(version: string): Promise<Release> {
     throw new Error('GITHUB_TOKEN is required')
   }
   let owner = context.repo.owner
-  let releaseName = core.getInput('releaseName').replace('refs/tags/', '')
+  let releaseName = core
+    .getInput('releaseName')
+    .replace('refs/tags/', '')
+    .replace('__VERSION__', version)
   let repo = context.repo.repo
   let draft = true
   let tagName = core

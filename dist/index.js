@@ -49156,7 +49156,9 @@ async function createRelease(version) {
         throw new Error('GITHUB_TOKEN is required');
     }
     let owner = lib_github.context.repo.owner;
-    let releaseName = core.getInput('releaseName').replace('refs/tags/', '');
+    let releaseName = core.getInput('releaseName')
+        .replace('refs/tags/', '')
+        .replace('__VERSION__', version);
     let repo = lib_github.context.repo.repo;
     let draft = true;
     let tagName = core.getInput('tagName')
@@ -49326,66 +49328,15 @@ try {
         let buildOptions = new BuildOptions(tomlData['rust-build-macos']);
         if (buildOptions == undefined)
             core.setFailed('Invalid toml data!');
-        console.log(buildOptions);
-        console.log(tomlData);
-        if (targets === null || (0,core.getInput)('targets') !== 'aarch64-apple-darwin')
+        if (targets === null)
+            core.setFailed('Please specify correct targets!');
+        if ((0,core.getInput)('targets') !== 'aarch64-apple-darwin,x86_64-apple-darwin' &&
+            (0,core.getInput)('targets') !== 'x86_64-apple-darwin,aarch64-apple-darwin')
             core.setFailed('Please specify correct targets!');
         if (targets)
             createRelease(tomlData.package.version).then(release => {
                 targets.forEach(target => {
-                    switch (target) {
-                        case 'aarch64-apple-darwin': {
-                            external_node_fs_default().mkdir('./bundles/aarch64-apple-darwin/' +
-                                buildOptions.displayName +
-                                '.app/Contents/MacOS/', { recursive: true }, err => {
-                                if (err)
-                                    core.setFailed(err.message);
-                                external_node_fs_default().copyFile(srcDir + 'target/aarch64-apple-darwin/debug/' + packageName, './bundles/aarch64-apple-darwin/' +
-                                    buildOptions.displayName +
-                                    '.app/Contents/MacOS/' +
-                                    packageName, err1 => {
-                                    if (err1)
-                                        core.setFailed(err1.message);
-                                    let iconPath = srcDir +
-                                        (buildOptions.icon.startsWith('./')
-                                            ? buildOptions.icon.replace('./', '')
-                                            : buildOptions.icon);
-                                    console.log(iconPath);
-                                    console.log(external_node_path_namespaceObject.basename(iconPath));
-                                    external_node_fs_default().mkdir('./bundles/aarch64-apple-darwin/' +
-                                        buildOptions.displayName +
-                                        '.app/Contents/Resources/', { recursive: true }, e => {
-                                        if (external_node_path_namespaceObject.extname(iconPath) == '' ||
-                                            (external_node_path_namespaceObject.extname(iconPath) !== '.png' &&
-                                                external_node_path_namespaceObject.extname(iconPath) !== '.icns'))
-                                            core.setFailed('Invalid icon!');
-                                        external_node_fs_default().copyFile(iconPath, './bundles/aarch64-apple-darwin/' +
-                                            buildOptions.displayName +
-                                            '.app/Contents/Resources/' +
-                                            external_node_path_namespaceObject.basename(iconPath), err1 => {
-                                            if (err1)
-                                                core.setFailed(err1.message);
-                                            external_node_fs_default().writeFile('./bundles/aarch64-apple-darwin/' +
-                                                buildOptions.displayName +
-                                                '.app/Contents/Info.plist', getInfoPlist(buildOptions, packageName, tomlData.package.version), err2 => {
-                                                if (err2)
-                                                    core.setFailed(err2.message);
-                                                compressDir('./bundles/aarch64-apple-darwin/' +
-                                                    buildOptions.displayName +
-                                                    '.app', './bundles/aarch64-apple-darwin/' +
-                                                    buildOptions.displayName +
-                                                    '.app.tar.gz').then(() => {
-                                                    uploadAssets(release.id, './bundles/aarch64-apple-darwin/' +
-                                                        buildOptions.displayName +
-                                                        '.app.tar.gz');
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        }
-                    }
+                    bundleApp(target, buildOptions, srcDir, packageName, tomlData, release);
                 });
             });
         console.log(external_node_fs_default().readdirSync('./'));
@@ -49395,6 +49346,73 @@ catch (error) {
     // Fail the workflow run if an error occurs
     if (error instanceof Error)
         core.setFailed(error.message);
+}
+function bundleApp(target, buildOptions, srcDir, packageName, tomlData, release) {
+    external_node_fs_default().mkdir('./bundles/' +
+        target +
+        '/' +
+        buildOptions.displayName +
+        '.app/Contents/MacOS/', { recursive: true }, err => {
+        if (err)
+            core.setFailed(err.message);
+        external_node_fs_default().copyFile(srcDir + 'target/' + target + '/debug/' + packageName, './bundles/' +
+            target +
+            '/' +
+            buildOptions.displayName +
+            '.app/Contents/MacOS/' +
+            packageName, err1 => {
+            if (err1)
+                core.setFailed(err1.message);
+            let iconPath = srcDir +
+                (buildOptions.icon.startsWith('./')
+                    ? buildOptions.icon.replace('./', '')
+                    : buildOptions.icon);
+            console.log(iconPath);
+            console.log(external_node_path_namespaceObject.basename(iconPath));
+            external_node_fs_default().mkdir('./bundles/' +
+                target +
+                '/' +
+                buildOptions.displayName +
+                '.app/Contents/Resources/', { recursive: true }, e => {
+                if (external_node_path_namespaceObject.extname(iconPath) == '' ||
+                    (external_node_path_namespaceObject.extname(iconPath) !== '.png' &&
+                        external_node_path_namespaceObject.extname(iconPath) !== '.icns'))
+                    core.setFailed('Invalid icon!');
+                external_node_fs_default().copyFile(iconPath, './bundles/' +
+                    target +
+                    '/' +
+                    buildOptions.displayName +
+                    '.app/Contents/Resources/' +
+                    external_node_path_namespaceObject.basename(iconPath), err1 => {
+                    if (err1)
+                        core.setFailed(err1.message);
+                    external_node_fs_default().writeFile('./bundles/' +
+                        target +
+                        '/' +
+                        buildOptions.displayName +
+                        '.app/Contents/Info.plist', getInfoPlist(buildOptions, packageName, tomlData.package.version), err2 => {
+                        if (err2)
+                            core.setFailed(err2.message);
+                        compressDir('./bundles/' +
+                            target +
+                            '/' +
+                            buildOptions.displayName +
+                            '.app', './bundles/' +
+                            target +
+                            '/' +
+                            buildOptions.displayName +
+                            '.app.tar.gz').then(() => {
+                            uploadAssets(release.id, './bundles/' +
+                                target +
+                                '/' +
+                                buildOptions.displayName +
+                                '.app.tar.gz');
+                        });
+                    });
+                });
+            });
+        });
+    });
 }
 function getInfoPlist(buildOptions, packageName, version) {
     return `<?xml version="1.0" encoding="UTF-8"?>

@@ -13,7 +13,6 @@ import * as path from 'node:path'
 import * as process from 'node:process'
 import compressDir = tgz.compressDir
 
-
 try {
   execa('echo', ['args'], { stdio: 'inherit' })
   let targets = getInput('targets').split(',')
@@ -35,14 +34,23 @@ try {
       core.setFailed('Could not find your package name in your Cargo.toml.')
     let buildOptions = new BuildOptions(tomlData['rust-build-macos'])
     if (buildOptions == undefined) core.setFailed('Invalid toml data!')
-    if (targets === null)
-      core.setFailed('Please specify correct targets!')
-    if (getInput('targets') !== 'aarch64-apple-darwin,x86_64-apple-darwin' && getInput('targets') !== 'x86_64-apple-darwin,aarch64-apple-darwin')
+    if (targets === null) core.setFailed('Please specify correct targets!')
+    if (
+      getInput('targets') !== 'aarch64-apple-darwin,x86_64-apple-darwin' &&
+      getInput('targets') !== 'x86_64-apple-darwin,aarch64-apple-darwin'
+    )
       core.setFailed('Please specify correct targets!')
     if (targets)
       createRelease(tomlData.package.version).then(release => {
         targets.forEach(target => {
-          bundleApp(target, buildOptions, srcDir, packageName, tomlData, release)
+          bundleApp(
+            target,
+            buildOptions,
+            srcDir,
+            packageName,
+            tomlData,
+            release
+          )
         })
       })
 
@@ -53,20 +61,31 @@ try {
   if (error instanceof Error) core.setFailed(error.message)
 }
 
-function bundleApp(target: string, buildOptions: BuildOptions, srcDir: string, packageName: string, tomlData: any, release: Release) {
+function bundleApp(
+  target: string,
+  buildOptions: BuildOptions,
+  srcDir: string,
+  packageName: string,
+  tomlData: any,
+  release: Release
+) {
   fs.mkdir(
-    './bundles/' + target + '/' +
-    buildOptions.displayName +
-    '.app/Contents/MacOS/',
+    './bundles/' +
+      target +
+      '/' +
+      buildOptions.displayName +
+      '.app/Contents/MacOS/',
     { recursive: true },
     err => {
       if (err) core.setFailed(err.message)
       fs.copyFile(
         srcDir + 'target/' + target + '/debug/' + packageName,
-        './bundles/' + target + '/' +
-        buildOptions.displayName +
-        '.app/Contents/MacOS/' +
-        packageName,
+        './bundles/' +
+          target +
+          '/' +
+          buildOptions.displayName +
+          '.app/Contents/MacOS/' +
+          packageName,
         err1 => {
           if (err1) core.setFailed(err1.message)
           let iconPath =
@@ -77,9 +96,11 @@ function bundleApp(target: string, buildOptions: BuildOptions, srcDir: string, p
           console.log(iconPath)
           console.log(path.basename(iconPath))
           fs.mkdir(
-            './bundles/' + target + '/' +
-            buildOptions.displayName +
-            '.app/Contents/Resources/',
+            './bundles/' +
+              target +
+              '/' +
+              buildOptions.displayName +
+              '.app/Contents/Resources/',
             { recursive: true },
             e => {
               if (
@@ -90,16 +111,20 @@ function bundleApp(target: string, buildOptions: BuildOptions, srcDir: string, p
                 core.setFailed('Invalid icon!')
               fs.copyFile(
                 iconPath,
-                './bundles/' + target + '/' +
-                buildOptions.displayName +
-                '.app/Contents/Resources/' +
-                path.basename(iconPath),
+                './bundles/' +
+                  target +
+                  '/' +
+                  buildOptions.displayName +
+                  '.app/Contents/Resources/' +
+                  path.basename(iconPath),
                 err1 => {
                   if (err1) core.setFailed(err1.message)
                   fs.writeFile(
-                    './bundles/' + target + '/' +
-                    buildOptions.displayName +
-                    '.app/Contents/Info.plist',
+                    './bundles/' +
+                      target +
+                      '/' +
+                      buildOptions.displayName +
+                      '.app/Contents/Info.plist',
                     getInfoPlist(
                       buildOptions,
                       packageName,
@@ -108,18 +133,24 @@ function bundleApp(target: string, buildOptions: BuildOptions, srcDir: string, p
                     err2 => {
                       if (err2) core.setFailed(err2.message)
                       compressDir(
-                        './bundles/' + target + '/' +
-                        buildOptions.displayName +
-                        '.app',
-                        './bundles/' + target + '/' +
-                        buildOptions.displayName +
-                        '.app.tar.gz'
+                        './bundles/' +
+                          target +
+                          '/' +
+                          buildOptions.displayName +
+                          '.app',
+                        './bundles/' +
+                          target +
+                          '/' +
+                          buildOptions.displayName +
+                          '.app.tar.gz'
                       ).then(() => {
                         uploadAssets(
                           release.id,
-                          './bundles/' + target + '/' +
-                          buildOptions.displayName +
-                          '.app.tar.gz'
+                          './bundles/' +
+                            target +
+                            '/' +
+                            buildOptions.displayName +
+                            '.app.tar.gz'
                         )
                       })
                     }
